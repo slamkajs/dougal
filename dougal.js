@@ -16,7 +16,12 @@
      *
      * @static
      * @function
-     * @param options
+     * @param options {Object}
+     * `attributes` (Object)
+     *
+     * `idAttribute` (String)
+     *
+     * `initialize` (Function)
      * @memberof module:dougal
      * @returns {ExtendedModel}
      */
@@ -63,13 +68,6 @@
      * @memberof module:dougal
      */
     function Model(values) {
-      _.assign(this.$$values, values);
-      this.$reset();
-    }
-
-    Model.prototype = {
-      constructor: Model,
-
       /**
        * @example
        * var car = new Car({name: 'Super Car!'});
@@ -77,7 +75,7 @@
        * car.name = '';
        * car.errors; // {name: 'Name cannot be empty'}
        */
-      $errors: {},
+      this.$errors = {};
 
       /**
        * Boolean property to indicate if a model has changed values.
@@ -87,17 +85,24 @@
        * car.name = 'New Name!';
        * car.$pristine; // false
        */
-      $pristine: true,
+      this.$pristine = true;
 
       /**
        * Is true if all attributes are valid. Unlike [$hasError]{@link Model#$hasError}, it covers all values, changed
        * or not.
        */
-      $valid: true,
+      this.$valid = true;
 
-      $$changed: {},
-      $$previousValues: {},
-      $$values: {},
+      this.$$changed = {};
+      this.$$previousValues = {};
+      this.$$values = {};
+
+      _.assign(this.$$values, values);
+      this.$reset();
+    }
+
+    Model.prototype = {
+      constructor: Model,
 
       /**
        * Reverts the current changes to the last known state.
@@ -141,6 +146,24 @@
        */
       $hasError: function (key) {
         return angular.isDefined(this.$$changed[key]) && angular.isDefined(this.$errors[key]);
+      },
+
+      /**
+       * Returns a unique ID for that model.
+       * By default, returns the `id` attribute, but can be overriden by the `idAttribute` option in [extend]{@link Model.extend}.
+       */
+      $id: function () {
+        return this.$$values[this.$$options.idAttribute || 'id'];
+      },
+
+      /**
+       * @returns {boolean}
+       * @example
+       * new Car({}).$isNew();        // true
+       * new Car({id: 123}).$isNew(); // false
+       */
+      $isNew: function () {
+        return angular.isUndefined(this.$id());
       },
 
       $$normalizeToPromise: function (value) {

@@ -15,7 +15,8 @@ describe('dougal.Model', function () {
             return _.trim(name).length > 0 || 'Name is required';
           }
         },
-        color: {}
+        color: {},
+        id: {}
       }
     };
     instantiateModel(defaultOptions)
@@ -25,7 +26,8 @@ describe('dougal.Model', function () {
     Car = Model.extend(options);
 
     testCar = new Car({
-      name: 'Super Car!'
+      name: 'Super Car!',
+      id: 1
     });
     $rootScope.$digest();
   }
@@ -77,6 +79,29 @@ describe('dougal.Model', function () {
       $rootScope.$digest();
       expect(testCar.$valid).toBe(false);
       expect(testCar.$hasError('name')).toBe(true);
+    });
+  });
+
+  describe('$id', function () {
+    it('should expose a unique ID', function () {
+      expect(testCar.$id()).toBe(1);
+    });
+
+    it('should allow to override the id attribute', function () {
+      defaultOptions.idAttribute = 'name';
+      instantiateModel(defaultOptions);
+      expect(testCar.$id()).toEqual('Super Car!');
+    });
+  });
+
+  describe('$isNew', function () {
+    it('should not be new', function () {
+      expect(testCar.$isNew()).toBe(false);
+    });
+
+    it('should be new', function () {
+      testCar = new Car();
+      expect(testCar.$isNew()).toBe(true);
     });
   });
 
