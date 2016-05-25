@@ -1,0 +1,25 @@
+{
+  "name": "dougal",
+  "homepage": "https://github.com/aol/dougal",
+  "authors": [
+    "Emmanuel Bourgerie <manu@bourgerie.fr>"
+  ],
+  "description": "TBD",
+  "main": "dougal.js",
+  "moduleType": [],
+  "keywords": [
+    "angular"
+  ],
+  "license": "Apache-2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.5.5",
+    "lodash": "^4.13.1"
+  }
+}

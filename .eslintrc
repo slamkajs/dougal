@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    "angular",
+    "jasmine",
+    "lodash"
+  ],
+  "extends": ["eslint:recommended"],
+  "globals": {
+    "angular": true,
+    "_": true
+  }
+}
