@@ -3,6 +3,5 @@ node_js:
     - "stable"
 before_script:
     - npm install
-    - npm install -gq gulp
 script:
-    - gulp test:unit
+    - npm test

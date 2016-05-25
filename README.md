@@ -6,7 +6,13 @@ ActiveRecord-like layer in Angular applications.
 
     $ bower install dougal --save
 
-And include `<script src="bower_components/dougal/dougal.js"></script>` in your HTML file.
+Include `<script src="bower_components/dougal/dougal.js"></script>` in your HTML file.
+
+Add `dougal` to the list of module dependencies in your Angular application.
+
+## Documentation
+
+    $ npm run doc
 
 ## Contribute
 
