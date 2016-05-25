@@ -1,6 +1,8 @@
 # Dougal
 
-ActiveRecord-like layer in Angular applications. [![Build Status](https://travis-ci.org/aol/dougal.svg?branch=master)](https://travis-ci.org/aol/dougal)
+[![Build Status](https://travis-ci.org/aol/dougal.svg?branch=master)](https://travis-ci.org/aol/dougal)
+
+ActiveRecord-like layer in Angular applications.
 
 ## Installation
 
