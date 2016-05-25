@@ -17,13 +17,17 @@
      * @static
      * @function
      * @param options {Object}
-     * `attributes` (Object)
+     * `attributes` (Object) describes each attribute of the model with the following options:
+     * * `$get`
+     * * `$set`
+     * * `$validate`
      *
-     * `idAttribute` (String)
+     * `idAttribute` (String) overrides the attribute used for {@link Model#$id}
      *
      * `initialize` (Function)
      * @memberof module:dougal
      * @returns {ExtendedModel}
+     * @since 0.1.0
      */
     Model.extend = function (options) {
       function ExtendedModel(values) {
@@ -66,6 +70,7 @@
      * @param values default values for the model
      * @class
      * @memberof module:dougal
+     * @since 0.1.0
      */
     function Model(values) {
       /**
@@ -74,6 +79,7 @@
        * car.errors; // {}
        * car.name = '';
        * car.errors; // {name: 'Name cannot be empty'}
+       * @since 0.1.0
        */
       this.$errors = {};
 
@@ -84,12 +90,14 @@
        * car.$pristine; // true
        * car.name = 'New Name!';
        * car.$pristine; // false
+       * @since 0.1.0
        */
       this.$pristine = true;
 
       /**
        * Is true if all attributes are valid. Unlike [$hasError]{@link Model#$hasError}, it covers all values, changed
        * or not.
+       * @since 0.1.0
        */
       this.$valid = true;
 
@@ -107,13 +115,14 @@
       /**
        * Reverts the current changes to the last known state.
        *
-       * @see Model#$reset
+       * @see {@link module:dougal.Model#$reset|$reset()}
        * @example
        * var car = new Car({name: 'Super Car!'});
        * car.name = 'New Name!';
        * car.$clear();
        * car.name; // 'Super Car!';
        * car.$pristine; // true
+       * @since 0.1.0
        */
       $clear: function () {
         this.$$changed = {};
@@ -127,6 +136,7 @@
        *
        * @param key
        * @example car.get('name')
+       * @since 0.1.0
        */
       $get: function (key) {
         return this.$$values[key];
@@ -143,14 +153,16 @@
        * car.$hasError('name'); // false
        * car.name = '  ';
        * car.$hasError('name'); // true
+       * @since 0.1.0
        */
       $hasError: function (key) {
         return angular.isDefined(this.$$changed[key]) && angular.isDefined(this.$errors[key]);
       },
 
       /**
-       * Returns a unique ID for that model.
-       * By default, returns the `id` attribute, but can be overriden by the `idAttribute` option in [extend]{@link Model.extend}.
+       * Returns a unique ID for that model. By default, returns the `id` attribute, but can be overriden by the
+       * `idAttribute` option in [extend]{@link Model.extend}.
+       * @since 0.2.0
        */
       $id: function () {
         return this.$$values[this.$$options.idAttribute || 'id'];
@@ -161,6 +173,7 @@
        * @example
        * new Car({}).$isNew();        // true
        * new Car({id: 123}).$isNew(); // false
+       * @since 0.2.0
        */
       $isNew: function () {
         return angular.isUndefined(this.$id());
@@ -179,13 +192,14 @@
       /**
        * Saves the current state as the last known.
        *
-       * @see Model#$clear
+       * @see {@link module:dougal.Model#$clear|$clear()}
        * @example
        * var car = new Car({name: 'Super Car!'});
        * car.name = 'New Name!';
        * car.$reset();
        * car.name; // 'New Name!';
        * car.$pristine; // true
+       * @since 0.1.0
        */
       $reset: function () {
         this.$$changed = {};
@@ -200,7 +214,8 @@
        *
        * @param key
        * @param value
-       * @example car.set('name', 'Super Car!')
+       * @example car.$set('name', 'Super Car!')
+       * @since 0.1.0
        */
       $set: function (key, value) {
         this.$pristine = false;
@@ -214,6 +229,7 @@
        *
        * @param options
        * @returns {*}
+       * @since 0.1.0
        */
       $validate: function (options) {
         if (_.isString(options)) {
