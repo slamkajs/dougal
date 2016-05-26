@@ -1,6 +1,7 @@
 # Dougal
 
 [![Build Status](https://travis-ci.org/aol/dougal.svg?branch=master)](https://travis-ci.org/aol/dougal)
+[![Coverage Status](https://coveralls.io/repos/github/aol/dougal/badge.svg)](https://coveralls.io/github/aol/dougal)
 
 ActiveRecord-like layer in Angular applications.
 

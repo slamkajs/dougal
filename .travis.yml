@@ -5,3 +5,5 @@ before_script:
     - npm install
 script:
     - npm test
+after_script:
+    - cat coverage/test/lcov.info | ./node_modules/.bin/coveralls
