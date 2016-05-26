@@ -1,11 +1,11 @@
 {
   "name": "dougal",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/aol/dougal",
   "authors": [
     "Emmanuel Bourgerie <manu@bourgerie.fr>"
   ],
-  "description": "TBD",
+  "description": "ActiveRecord-like layer in Angular applications",
   "main": "dougal.js",
   "moduleType": [],
   "keywords": [

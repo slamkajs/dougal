@@ -1,5 +1,5 @@
 /**
- * Dougal v0.1.0
+ * Dougal v0.1.1
  * @module dougal
  */
 (function () {
@@ -162,7 +162,7 @@
       /**
        * Returns a unique ID for that model. By default, returns the `id` attribute, but can be overriden by the
        * `idAttribute` option in [extend]{@link Model.extend}.
-       * @since 0.2.0
+       * @since 0.1.1
        */
       $id: function () {
         return this.$$values[this.$$options.idAttribute || 'id'];
@@ -173,7 +173,7 @@
        * @example
        * new Car({}).$isNew();        // true
        * new Car({id: 123}).$isNew(); // false
-       * @since 0.2.0
+       * @since 0.1.1
        */
       $isNew: function () {
         return angular.isUndefined(this.$id());
