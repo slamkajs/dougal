@@ -1,5 +1,5 @@
 /**
- * Dougal v0.1.1
+ * Dougal v0.2.0
  * @module dougal
  */
 (function () {
@@ -90,7 +90,7 @@
      * @param method {String}
      * @param model {module:dougal.Model}
      * @returns {Promise}
-     * @since NEXT_VERSION
+     * @since 0.2.0
      */
     Model.sync = function (method, model) {
       var options = {
@@ -232,7 +232,7 @@
        * (soon)
        *
        * @param values
-       * @since NEXT_VERSION
+       * @since 0.2.0
        */
       $parse: function (values) {
         _.assign(this.$$values, values);
@@ -262,7 +262,7 @@
        * (soon)
        *
        * @returns {Promise}
-       * @since NEXT_VERSION
+       * @since 0.2.0
        */
       $save: function () {
         return this.$validate()
@@ -301,7 +301,7 @@
        * @example
        * new Car({id: 123, name: 'Super Car!', color: 'blue'}).toJson();
        * // {id: 123, name: 'Super Car!', color: 'blue'}
-       * @since NEXT_VERSION
+       * @since 0.2.0
        */
       $toJson: function () {
         return _.pick(this.$$values, _.keys(this.$$options.attributes));
@@ -315,7 +315,7 @@
        * car.$url(); // /cars
        * car = new Car({id: 123});
        * car.$url(); // /cars/123
-       * @since NEXT_VERSION
+       * @since 0.2.0
        */
       $url: function () {
         if (this.$isNew()) {
