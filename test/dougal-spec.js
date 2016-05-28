@@ -1,11 +1,12 @@
 describe('dougal.Model', function () {
 
-  var Model, Car, testCar, defaultOptions, $rootScope;
+  var Model, Car, testCar, defaultOptions, $httpBackend, $rootScope;
 
   beforeEach(module('dougal'));
 
   beforeEach(inject(function ($injector) {
     Model = $injector.get('Model');
+    $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
 
     defaultOptions = {
@@ -17,9 +18,10 @@ describe('dougal.Model', function () {
         },
         color: {},
         id: {}
-      }
+      },
+      baseUrl: '/cars'
     };
-    instantiateModel(defaultOptions)
+    instantiateModel(defaultOptions);
   }));
 
   function instantiateModel(options) {
@@ -70,12 +72,9 @@ describe('dougal.Model', function () {
   });
 
   describe('$hasError', function () {
-    it('should have an error if the value has changed and is invalid', function () {
-      testCar = new Car({name: ''});
-      $rootScope.$digest();
-      expect(testCar.$valid).toBe(false);
-      expect(testCar.$hasError('name')).toBe(false);
-      testCar.name = ' ';
+    it('should have an error if the value is invalid', function () {
+      testCar = new Car({name: ' '});
+      testCar.$$validateAttribute('name');
       $rootScope.$digest();
       expect(testCar.$valid).toBe(false);
       expect(testCar.$hasError('name')).toBe(true);
@@ -113,6 +112,28 @@ describe('dougal.Model', function () {
     });
   });
 
+  describe('$save', function () {
+    it('should save an existing car', function () {
+      $httpBackend.expectPUT('/cars/1', {id: 1, name: 'New Name!'})
+        .respond({id: 1, name: 'New Name!'});
+      testCar.name = 'New Name!';
+      testCar.$save();
+      $httpBackend.flush();
+      expect(testCar.name).toBe('New Name!');
+      expect(testCar.$pristine).toBe(true);
+    });
+
+    it('should save a new car', function () {
+      $httpBackend.expectPOST('/cars', {name: 'Super Car!'})
+        .respond({id: 1, name: 'Super Car!'});
+      testCar = new Car({name: 'Super Car!'});
+      testCar.$save();
+      $httpBackend.flush();
+      expect(testCar.$id()).toBe(1);
+      expect(testCar.$pristine).toBe(true);
+    });
+  });
+
   describe('$set', function () {
     it('should set the value', function () {
       testCar.name = 'New value';
@@ -130,10 +151,26 @@ describe('dougal.Model', function () {
     });
   });
 
+  describe('$toJson', function () {
+    it('should prepare a JSON-friendly version of the model', function () {
+      expect(testCar.$toJson()).toEqual({id: 1, name: 'Super Car!'});
+    });
+  });
+
+  describe('$url', function () {
+    it('should provide the correct URLs', function () {
+      expect(testCar.$url()).toEqual('/cars/1');
+      testCar.id = undefined;
+      expect(testCar.$url()).toEqual('/cars');
+    });
+  });
+
   describe('$validate', function () {
     it('should validate a single attribute', function () {
       testCar.name = ' ';
-      testCar.$validate('name');
+      testCar.$validate('name').then(function () {
+        fail('it should not resolve the promise');
+      });
       $rootScope.$digest();
       expect(testCar.$errors).toEqual({
         name: 'Name is required'
@@ -143,7 +180,9 @@ describe('dougal.Model', function () {
 
     it('should validate all attributes', function () {
       testCar.name = ' ';
-      testCar.$validate();
+      testCar.$validate().then(function () {
+        fail('it should not resolve the promise');
+      });
       $rootScope.$digest();
       expect(testCar.$errors).toEqual({
         name: 'Name is required'
