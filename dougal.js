@@ -63,17 +63,23 @@
       _.each(options.attributes, function (attribute, key) {
         Object.defineProperty(ExtendedModel.prototype, key, {
           get: function () {
-            if (attribute.$get) {
-              return attribute.$get.call(this);
-            } else {
+            function $super() {
               return this.$get(key);
+            }
+            if (attribute.$get) {
+              return attribute.$get.call(this, _.bind($super, this));
+            } else {
+              return $super.call(this);
             }
           },
           set: function (value) {
-            if (attribute.$set) {
-              return attribute.$set.call(this, value);
-            } else {
+            function $super(value) {
               return this.$set(key, value);
+            }
+            if (attribute.$set) {
+              return attribute.$set.call(this, value, _.bind($super, this));
+            } else {
+              return $super.call(this, value);
             }
           }
         });

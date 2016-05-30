@@ -65,7 +65,11 @@ describe('dougal.Model', function () {
     });
 
     it('should allow to override the getter', function () {
-      defaultOptions.attributes.name.$get = _.constant('custom getter');
+      defaultOptions.attributes.name.$get = function ($super) {
+        expect(this.$$values.name).toEqual('Super Car!');
+        expect($super()).toEqual('Super Car!');
+        return 'custom getter';
+      };
       instantiateModel(defaultOptions);
       expect(testCar.name).toEqual('custom getter');
     });
@@ -142,8 +146,9 @@ describe('dougal.Model', function () {
     });
 
     it('should allow to override the setter', function () {
-      defaultOptions.attributes.name.$set = function (name) {
-        Model.prototype.$set.call(this, 'name', _.trim(name));
+      defaultOptions.attributes.name.$set = function (name, $super) {
+        expect(this.$$values.name).toEqual('Super Car!');
+        $super(_.trim(name));
       };
       instantiateModel(defaultOptions);
       testCar.name = '  New value  ';
