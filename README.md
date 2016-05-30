@@ -5,13 +5,60 @@
 
 ActiveRecord-like layer in Angular applications.
 
-## Installation
+## Getting started
+
+Install Dougal using bower:
 
     $ bower install dougal --save
 
-Include `<script src="bower_components/dougal/dougal.js"></script>` in your HTML file.
+Include it in your HTML file:
 
-Add `dougal` to the list of module dependencies in your Angular application.
+```html
+<script src="bower_components/dougal/dougal.js"></script>
+```
+
+Add `dougal` to the list of module dependencies in your Angular application:
+
+```javascript
+angular.module('your.app', ['dougal']);
+```
+
+Create your own model:
+
+```javascript
+angular.module('your.app').factory('Car', function (Model) {
+  return Model.extend({
+    attributes: {
+      name: {
+        $validate: function (name) {
+          return _.trim(name).length > 0 || 'Name is required';
+        }
+      },
+      id: {}
+    },
+    baseUrl: '/cars'
+  });
+});
+```
+
+Use the model in your controller:
+
+```javascript
+angular.module('your.app').controller('CarController', function (Car) {
+  this.car = new Car();
+});
+```
+
+```html
+<div ng-controller="CarController as vm">
+  <input ng-model="vm.car.name" />
+  <p class="error" ng-show="vm.car.$hasError('name')">
+    {{ vm.car.$errors.name }}
+  </p>
+</div>
+```
+
+And voilà !
 
 ## Documentation
 
