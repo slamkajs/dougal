@@ -12,11 +12,11 @@
    * angular.module('your.app', ['dougal']);
    * @since 0.1.0
    */
-  angular.module('dougal', [])
-    .factory('Model', ModelFactory);
+  var Dougal = angular.module('dougal', []);
 
-  ModelFactory.$inject = ['$http', '$interpolate', '$q'];
-  function ModelFactory($http, $interpolate, $q) {
+  Dougal.factory('Model', ModelFactory);
+  ModelFactory.$inject = ['HttpStore', '$q'];
+  function ModelFactory(HttpStore, $q) {
 
     /**
      * Creates a new model that inherits from the {@link module:dougal.Model|Model} class.
@@ -30,14 +30,6 @@
      * * `$validate`
      *
      * `baseUrl` (String)
-     *
-     * | Action | URL | Method |
-     * |--------|-----|--------|
-     * | Index | /cars | GET |
-     * | Fetch | /cars/:id | GET |
-     * | Create | /cars | POST |
-     * | Update | /cars/:id | PUT |
-     * | Delete | /cars/:id | DELETE |
      *
      * `idAttribute` (String) overrides the attribute used for {@link module:dougal.Model#$id|$id}
      *
@@ -55,17 +47,14 @@
         }
       }
 
+      options.idAttribute = options.idAttribute || 'id';
+
       ExtendedModel.prototype = _.create(Model.prototype, {
-        $$idAttribute: options.idAttribute || 'id',
+        $$idAttribute: options.idAttribute,
         $$options: options
       });
 
-      if (options.baseUrl) {
-        ExtendedModel.prototype.$$baseUrl = {
-          index: $interpolate(options.baseUrl),
-          fetch: $interpolate(options.baseUrl + '/{{' + ExtendedModel.prototype.$$idAttribute + '}}')
-        };
-      }
+      ExtendedModel.prototype.$$store = new HttpStore(options);
 
       _.each(options.attributes, function (attribute, key) {
         Object.defineProperty(ExtendedModel.prototype, key, {
@@ -93,31 +82,6 @@
       });
 
       return ExtendedModel;
-    };
-
-    /**
-     * Saves modifications made to the given model.
-     *
-     * @static
-     * @memberof module:dougal
-     * @param method {String}
-     * @param model
-     * @returns {Promise}
-     * @since 0.2.0
-     * @see {@link module:dougal.Model#$url|$url()}
-     */
-    Model.sync = function (method, model) {
-      var options = {
-        data: model.$toJson(),
-        url: model.$url()
-      };
-
-      options.method = {
-        create: 'POST',
-        update: 'PUT'
-      }[method];
-
-      return $http(options);
     };
 
     /**
@@ -275,7 +239,7 @@
       },
 
       /**
-       * (soon)
+       * Saves modifications made to the given model.
        *
        * @returns {Promise}
        * @since 0.2.0
@@ -289,9 +253,9 @@
             }
 
             if (this.$isNew()) {
-              return Model.sync('create', this).then(_.bind(callback, this));
+              return this.$$store.sync('create', this).then(_.bind(callback, this));
             } else {
-              return Model.sync('update', this).then(_.bind(callback, this));
+              return this.$$store.sync('update', this).then(_.bind(callback, this));
             }
           }, this));
       },
@@ -321,28 +285,6 @@
        */
       $toJson: function () {
         return _.pick(this.$$values, _.keys(this.$$options.attributes));
-      },
-
-
-      /**
-       * @returns {String} URL for the model using Angular's `$interpolate` and the model's attributes.
-       * @see {@link module:dougal.Model#$toJson|$toJson()}
-       * @example
-       * car = new Car();
-       * car.$url(); // /cars
-       * car = new Car({id: 123});
-       * car.$url(); // /cars/123
-       * // works with all attributes:
-       * new CarPart({carId: 123, id: 456}).$url();
-       * // /cars/123/parts/456 => baseUrl: /cars/{{carId}}/parts/{{id}}
-       * @since 0.2.0
-       */
-      $url: function () {
-        if (this.$isNew()) {
-          return this.$$baseUrl.index(this.$toJson());
-        } else {
-          return this.$$baseUrl.fetch(this.$toJson());
-        }
       },
 
       /**
@@ -381,6 +323,75 @@
     };
 
     return Model;
+  }
+
+  Dougal.factory('HttpStore', HttpStoreFactory);
+  HttpStoreFactory.$inject = ['$http', '$interpolate'];
+  function HttpStoreFactory($http, $interpolate) {
+    /**
+     * HTTP storage layer
+     *
+     * | Action | URL | Method |
+     * |--------|-----|--------|
+     * | Index | `/cars` | GET |
+     * | Fetch | `/cars/:id` | GET |
+     * | Create | `/cars` | POST |
+     * | Update | `/cars/:id` | PUT |
+     * | Delete | `/cars/:id` | DELETE |
+     *
+     * @param options
+     * @class
+     * @memberof module:dougal
+     * @since NEXT_VERSION
+     */
+    function HttpStore(options) {
+      this.baseUrl = {
+        index: $interpolate(options.baseUrl),
+        fetch: $interpolate(options.baseUrl + '/{{' + options.idAttribute + '}}')
+      };
+    }
+
+    HttpStore.prototype = {
+      constructor: HttpStore,
+
+      create: function (model) {
+        return this.sync('POST', model);
+      },
+
+      sync: function (method, model) {
+        return $http({
+          data: model.$toJson(),
+          method: method,
+          url: this.url(model)
+        });
+      },
+
+      update: function (model) {
+        return this.sync('PUT', model);
+      },
+
+      /**
+       * @returns {String} URL for the model using Angular's `$interpolate` and the model's attributes.
+       * @param model
+       * @see {@link module:dougal.Model#$toJson|$toJson()}
+       * @example
+       * store.url(new Car()); // /cars
+       * store.url(new Car({id: 123})); // /cars/123
+       * // works with all attributes:
+       * partsStore.url(new CarPart({carId: 123, id: 456}));
+       * // /cars/123/parts/456 => baseUrl: /cars/{{carId}}/parts/{{id}}
+       * @since NEXT_VERSION
+       */
+      url: function (model) {
+        if (model.$isNew()) {
+          return this.baseUrl.index(model.$toJson());
+        } else {
+          return this.baseUrl.fetch(model.$toJson());
+        }
+      }
+    };
+
+    return HttpStore;
   }
 
 })();

@@ -162,14 +162,6 @@ describe('dougal.Model', function () {
     });
   });
 
-  describe('$url', function () {
-    it('should provide the correct URLs', function () {
-      expect(testCar.$url()).toEqual('/cars/1');
-      testCar.id = undefined;
-      expect(testCar.$url()).toEqual('/cars');
-    });
-  });
-
   describe('$validate', function () {
     it('should validate a single attribute', function () {
       testCar.name = ' ';

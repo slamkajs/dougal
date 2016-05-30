@@ -1,7 +1,7 @@
 {
   "name": "dougal",
   "version": "0.2.0",
-  "description": "ActiveRecord-like layer in Angular applications",
+  "description": "The M of MVC for Angular.js applications",
   "main": "dougal.js",
   "scripts": {
     "test": "./node_modules/.bin/karma start --single-run",
