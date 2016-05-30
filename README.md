@@ -1,6 +1,7 @@
 # Dougal
 
 [![Bower](https://img.shields.io/bower/v/dougal.svg?maxAge=2592000)](https://github.com/aol/dougal/releases)
+[![npm](https://img.shields.io/npm/v/dougal.svg?maxAge=2592000)](https://www.npmjs.com/package/dougal)
 [![Build status](https://img.shields.io/travis/aol/dougal/master.svg?maxAge=2592000)](https://travis-ci.org/aol/dougal)
 [![Coveralls branch](https://img.shields.io/coveralls/aol/dougal/master.svg?maxAge=2592000)](https://coveralls.io/github/aol/dougal)
 
