@@ -68,4 +68,4 @@ And voilà!
 
 ## Contribute
 
-    $ npm test
+    $ gulp test

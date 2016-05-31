@@ -1,6 +1,11 @@
 {
   "plugins": ["plugins/markdown"],
   "source": {
-    "include": ["README.md", "dougal.js"]
+    "include": [
+      "README.md",
+      "src/module.js",
+      "src/httpStore.js",
+      "src/model.js"
+    ]
   }
 }

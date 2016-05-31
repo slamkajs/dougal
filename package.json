@@ -4,7 +4,8 @@
   "description": "The M of MVC for Angular.js applications",
   "main": "dougal.js",
   "scripts": {
-    "test": "./node_modules/.bin/karma start --single-run",
+    "dist": "./node_modules/.bin/gulp dist",
+    "test": "./node_modules/.bin/gulp test",
     "doc": "./node_modules/.bin/jsdoc --configure jsdoc.conf.json --destination doc"
   },
   "repository": {
@@ -30,6 +31,9 @@
     "eslint-plugin-lodash": "^1.9.0",
     "eslint-plugin-promise": "^1.1.0",
     "eslint-plugin-standard": "^1.3.2",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-wrap": "^0.13.0",
     "jasmine-core": "^2.4.1",
     "jsdoc": "^3.4.0",
     "karma": "^0.13.22",
