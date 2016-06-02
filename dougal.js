@@ -15,10 +15,68 @@
  */
 angular.module('dougal', []);
 
-angular.module('dougal').factory('Model', ModelFactory);
+angular.module('dougal').factory('Collection', CollectionFactory);
 
-ModelFactory.$inject = ['HttpStore', '$q'];
-function ModelFactory(HttpStore, $q) {
+CollectionFactory.$inject = [];
+function CollectionFactory() {
+
+  /**
+   * Overrides native JS arrays with Dougal specific functions
+   *
+   * @example
+   * var cars = new Collection({Model: Car});
+   * cars.push(someCar);
+   * cars[0]; // someCar
+   *
+   * @param options {Object}
+   * * `Model`
+   * * `data` (optional)
+   * @constructor
+   * @memberof module:dougal
+   * @since NEXT_VERSION
+   */
+  function Collection(options) {
+    Array.call(this);
+
+    this.Model = options.Model;
+
+    if (options.data) {
+      this.parse(options.data);
+    }
+  }
+
+  Collection.prototype = _.create(Array.prototype, {
+
+    /**
+     * @instance
+     * @memberof module:dougal.Collection
+     * @since NEXT_VERSION
+     */
+    clear: function () {
+      this.length = 0;
+    },
+
+    /**
+     * @instance
+     * @param data {Array}
+     * @memberof module:dougal.Collection
+     * @since NEXT_VERSION
+     */
+    parse: function (data) {
+      this.clear();
+      _.each(data, _.bind(function (values) {
+        this.push(new this.Model(values));
+      }, this));
+    }
+  });
+
+  return Collection;
+}
+
+angular.module('dougal').run(extendModel);
+
+extendModel.$inject = ['Collection', 'HttpStore', 'Model'];
+function extendModel(Collection, HttpStore, Model) {
 
   /**
    * Creates a new model that inherits from the {@link module:dougal.Model|Model} class.
@@ -53,10 +111,39 @@ function ModelFactory(HttpStore, $q) {
 
     ExtendedModel.prototype = _.create(Model.prototype, {
       $$idAttribute: options.idAttribute,
-      $$options: options
+      $$options: options,
+      $$store: new HttpStore(options)
     });
 
-    ExtendedModel.prototype.$$store = new HttpStore(options);
+    _.assign(ExtendedModel, {
+      /**
+       * (soon)
+       * @static
+       * @memberof module:dougal.Model
+       * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Collection|Collection}
+       */
+      all: function () {
+        return ExtendedModel.prototype.$$store.list({}).then(function (response) {
+          return new Collection({
+            Model: ExtendedModel,
+            data: response.data
+          });
+        });
+      },
+
+      /**
+       * (soon)
+       * @static
+       * @param id {any}
+       * @memberof module:dougal.Model
+       * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Model|Model}
+       */
+      find: function (id) {
+        var model = new ExtendedModel();
+        model.$set(options.idAttribute, id);
+        return model.$fetch();
+      }
+    });
 
     _.each(options.attributes, function (attribute, key) {
       Object.defineProperty(ExtendedModel.prototype, key, {
@@ -64,6 +151,7 @@ function ModelFactory(HttpStore, $q) {
           function $super() {
             return this.$get(key);
           }
+
           if (attribute.$get) {
             return attribute.$get.call(this, _.bind($super, this));
           } else {
@@ -74,6 +162,7 @@ function ModelFactory(HttpStore, $q) {
           function $super(value) {
             return this.$set(key, value);
           }
+
           if (attribute.$set) {
             return attribute.$set.call(this, value, _.bind($super, this));
           } else {
@@ -85,6 +174,11 @@ function ModelFactory(HttpStore, $q) {
 
     return ExtendedModel;
   };
+}
+angular.module('dougal').factory('Model', ModelFactory);
+
+ModelFactory.$inject = ['$q'];
+function ModelFactory($q) {
 
   /**
    * Default constructor. Should never be called directly, but through an implementation using
@@ -152,6 +246,17 @@ function ModelFactory(HttpStore, $q) {
       this.$$values = _.clone(this.$$previousValues, true);
       this.$errors = {};
       this.$pristine = true;
+    },
+
+    /**
+     * @since NEXT_VERSION
+     */
+    $fetch: function () {
+      return this.$$store.fetch(this)
+        .then(_.bind(function (response) {
+          this.$parse(response.data);
+          return this;
+        }, this));
     },
 
     /**
@@ -301,6 +406,10 @@ function ModelFactory(HttpStore, $q) {
         return this.$$validateAttribute(options);
       }
 
+      return this.$$validateAllAttributes();
+    },
+
+    $$validateAllAttributes: function () {
       return $q.all(_.map(this.$$options.attributes, _.bind(function (value, key) {
         return this.$$validateAttribute(key);
       }, this))).catch(_.bind(function () {
@@ -359,6 +468,20 @@ function HttpStoreFactory($http, $interpolate) {
 
     create: function (model) {
       return this.sync('POST', model);
+    },
+
+    fetch: function (model) {
+      return $http({
+        url: this.url(model),
+        method: 'GET'
+      });
+    },
+
+    list: function (criteria) {
+      return $http({
+        url: this.baseUrl.index(criteria),
+        method: 'GET'
+      });
     },
 
     sync: function (method, model) {

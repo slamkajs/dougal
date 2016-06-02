@@ -20,7 +20,7 @@ module.exports = function(config) {
       'node_modules/lodash/lodash.js',
       'src/module.js',
       'src/*.js',
-      'test/*-spec.js'
+      'test/*.js'
     ],
 
 

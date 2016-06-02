@@ -1,73 +1,7 @@
 angular.module('dougal').factory('Model', ModelFactory);
 
-ModelFactory.$inject = ['HttpStore', '$q'];
-function ModelFactory(HttpStore, $q) {
-
-  /**
-   * Creates a new model that inherits from the {@link module:dougal.Model|Model} class.
-   *
-   * @static
-   * @function
-   * @param options {Object}
-   * `attributes` (Object) describes each attribute of the model with the following options:
-   * * `$get`
-   * * `$set`
-   * * `$validate`
-   *
-   * `baseUrl` (String)
-   *
-   * `idAttribute` (String) overrides the attribute used for {@link module:dougal.Model#$id|$id}
-   *
-   * `initialize` (Function)
-   * @memberof module:dougal
-   * @returns {ExtendedModel}
-   * @since 0.1.0
-   */
-  Model.extend = function (options) {
-    function ExtendedModel(values) {
-      if (options.initialize) {
-        options.initialize.apply(this, arguments);
-      } else {
-        Model.call(this, values);
-      }
-    }
-
-    options.idAttribute = options.idAttribute || 'id';
-
-    ExtendedModel.prototype = _.create(Model.prototype, {
-      $$idAttribute: options.idAttribute,
-      $$options: options
-    });
-
-    ExtendedModel.prototype.$$store = new HttpStore(options);
-
-    _.each(options.attributes, function (attribute, key) {
-      Object.defineProperty(ExtendedModel.prototype, key, {
-        get: function () {
-          function $super() {
-            return this.$get(key);
-          }
-          if (attribute.$get) {
-            return attribute.$get.call(this, _.bind($super, this));
-          } else {
-            return $super.call(this);
-          }
-        },
-        set: function (value) {
-          function $super(value) {
-            return this.$set(key, value);
-          }
-          if (attribute.$set) {
-            return attribute.$set.call(this, value, _.bind($super, this));
-          } else {
-            return $super.call(this, value);
-          }
-        }
-      });
-    });
-
-    return ExtendedModel;
-  };
+ModelFactory.$inject = ['$q'];
+function ModelFactory($q) {
 
   /**
    * Default constructor. Should never be called directly, but through an implementation using
@@ -135,6 +69,17 @@ function ModelFactory(HttpStore, $q) {
       this.$$values = _.clone(this.$$previousValues, true);
       this.$errors = {};
       this.$pristine = true;
+    },
+
+    /**
+     * @since NEXT_VERSION
+     */
+    $fetch: function () {
+      return this.$$store.fetch(this)
+        .then(_.bind(function (response) {
+          this.$parse(response.data);
+          return this;
+        }, this));
     },
 
     /**
@@ -284,6 +229,10 @@ function ModelFactory(HttpStore, $q) {
         return this.$$validateAttribute(options);
       }
 
+      return this.$$validateAllAttributes();
+    },
+
+    $$validateAllAttributes: function () {
       return $q.all(_.map(this.$$options.attributes, _.bind(function (value, key) {
         return this.$$validateAttribute(key);
       }, this))).catch(_.bind(function () {

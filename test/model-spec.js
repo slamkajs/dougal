@@ -1,26 +1,16 @@
 describe('dougal.Model', function () {
 
-  var Model, Car, testCar, defaultOptions, $httpBackend, $rootScope;
+  var Model, Car, BasicCar, testCar, defaultOptions, $httpBackend, $rootScope;
 
   beforeEach(module('dougal'));
 
   beforeEach(inject(function ($injector) {
+    BasicCar = $injector.get('BasicCar');
     Model = $injector.get('Model');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
 
-    defaultOptions = {
-      attributes: {
-        name: {
-          $validate: function (name) {
-            return _.trim(name).length > 0 || 'Name is required';
-          }
-        },
-        color: {},
-        id: {}
-      },
-      baseUrl: '/cars'
-    };
+    defaultOptions = _.clone(BasicCar.prototype.$$options, true);
     instantiateModel(defaultOptions);
   }));
 
@@ -33,6 +23,14 @@ describe('dougal.Model', function () {
     });
     $rootScope.$digest();
   }
+
+  describe('all', function () {
+    // TODO
+  });
+
+  describe('find', function () {
+    // TODO
+  });
 
   describe('constructor', function () {
     it('should create a new instance of the model', function () {
@@ -57,6 +55,10 @@ describe('dougal.Model', function () {
       expect(testCar.name).toEqual('Super Car!');
       expect(testCar.$pristine).toBe(true);
     });
+  });
+
+  describe('$fetch', function () {
+    // TODO
   });
 
   describe('$get', function () {

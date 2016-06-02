@@ -10,6 +10,8 @@ var gulp = require('gulp'),
 var paths = {
   src: [
     'src/module.js',
+    'src/collection.js',
+    'src/extend.js',
     'src/model.js',
     'src/httpStore.js'
   ],
