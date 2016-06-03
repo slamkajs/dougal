@@ -42,7 +42,8 @@ function HttpStoreFactory($http, $interpolate) {
     list: function (criteria) {
       return $http({
         url: this.baseUrl.index(criteria),
-        method: 'GET'
+        method: 'GET',
+        params: criteria
       });
     },
 

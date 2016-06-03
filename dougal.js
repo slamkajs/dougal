@@ -29,7 +29,7 @@ function CollectionFactory() {
    * cars[0]; // someCar
    *
    * @param options {Object}
-   * * `Model`
+   * * `model`
    * * `data` (optional)
    * @constructor
    * @memberof module:dougal
@@ -38,7 +38,7 @@ function CollectionFactory() {
   function Collection(options) {
     Array.call(this);
 
-    this.Model = options.Model;
+    this.Model = options.model;
 
     if (options.data) {
       this.parse(options.data);
@@ -67,6 +67,17 @@ function CollectionFactory() {
       _.each(data, _.bind(function (values) {
         this.push(new this.Model(values));
       }, this));
+    },
+
+    /**
+     * @instance
+     * @memberof module:dougal.Collection
+     * @since NEXT_VERSION
+     */
+    toJson: function () {
+      return _.map(this, function (model) {
+        return model.$toJson();
+      });
     }
   });
 
@@ -125,7 +136,7 @@ function extendModel(Collection, HttpStore, Model) {
       all: function () {
         return ExtendedModel.prototype.$$store.list({}).then(function (response) {
           return new Collection({
-            Model: ExtendedModel,
+            model: ExtendedModel,
             data: response.data
           });
         });
@@ -142,6 +153,21 @@ function extendModel(Collection, HttpStore, Model) {
         var model = new ExtendedModel();
         model.$set(options.idAttribute, id);
         return model.$fetch();
+      },
+
+      /**
+       * (soon)
+       * @static
+       * @memberof module:dougal.Model
+       * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Collection|Collection}
+       */
+      where: function (options) {
+        return ExtendedModel.prototype.$$store.list(options).then(function (response) {
+          return new Collection({
+            model: ExtendedModel,
+            data: response.data
+          });
+        });
       }
     });
 
@@ -175,6 +201,7 @@ function extendModel(Collection, HttpStore, Model) {
     return ExtendedModel;
   };
 }
+
 angular.module('dougal').factory('Model', ModelFactory);
 
 ModelFactory.$inject = ['$q'];
@@ -480,7 +507,8 @@ function HttpStoreFactory($http, $interpolate) {
     list: function (criteria) {
       return $http({
         url: this.baseUrl.index(criteria),
-        method: 'GET'
+        method: 'GET',
+        params: criteria
       });
     },
 

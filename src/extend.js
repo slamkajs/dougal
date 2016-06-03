@@ -67,6 +67,21 @@ function extendModel(Collection, HttpStore, Model) {
         var model = new ExtendedModel();
         model.$set(options.idAttribute, id);
         return model.$fetch();
+      },
+
+      /**
+       * (soon)
+       * @static
+       * @memberof module:dougal.Model
+       * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Collection|Collection}
+       */
+      where: function (options) {
+        return ExtendedModel.prototype.$$store.list(options).then(function (response) {
+          return new Collection({
+            model: ExtendedModel,
+            data: response.data
+          });
+        });
       }
     });
 

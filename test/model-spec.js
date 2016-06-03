@@ -56,6 +56,24 @@ describe('dougal.Model', function () {
     });
   });
 
+  describe('where', function () {
+    it('should load multiple models matching a criteria', function () {
+      $httpBackend.expectGET('/cars?status=ACTIVE')
+        .respond([
+          {id: 1, name: 'Super Car!'},
+          {id: 2, name: 'Another Car!'}
+        ]);
+      var cars;
+      Car.where({status: 'ACTIVE'}).then(function (response) {
+        cars = response;
+      });
+      $httpBackend.flush();
+      expect(cars instanceof Collection).toBe(true);
+      expect(cars.length).toBe(2);
+      expect(cars[0].name).toEqual('Super Car!');
+    });
+  });
+
   describe('constructor', function () {
     it('should create a new instance of the model', function () {
       expect(testCar instanceof Car).toBe(true);
