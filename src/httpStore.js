@@ -32,6 +32,21 @@ function HttpStoreFactory($http, $interpolate) {
       return this.sync('POST', model);
     },
 
+    fetch: function (model) {
+      return $http({
+        url: this.url(model),
+        method: 'GET'
+      });
+    },
+
+    list: function (criteria) {
+      return $http({
+        url: this.baseUrl.index(criteria),
+        method: 'GET',
+        params: criteria
+      });
+    },
+
     sync: function (method, model) {
       return $http({
         data: model.$toJson(),

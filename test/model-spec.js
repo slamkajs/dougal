@@ -1,26 +1,17 @@
 describe('dougal.Model', function () {
 
-  var Model, Car, testCar, defaultOptions, $httpBackend, $rootScope;
+  var Model, Car, Collection, BasicCar, testCar, defaultOptions, $httpBackend, $rootScope;
 
   beforeEach(module('dougal'));
 
   beforeEach(inject(function ($injector) {
+    BasicCar = $injector.get('BasicCar');
+    Collection = $injector.get('Collection');
     Model = $injector.get('Model');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
 
-    defaultOptions = {
-      attributes: {
-        name: {
-          $validate: function (name) {
-            return _.trim(name).length > 0 || 'Name is required';
-          }
-        },
-        color: {},
-        id: {}
-      },
-      baseUrl: '/cars'
-    };
+    defaultOptions = _.clone(BasicCar.prototype.$$options, true);
     instantiateModel(defaultOptions);
   }));
 
@@ -33,6 +24,55 @@ describe('dougal.Model', function () {
     });
     $rootScope.$digest();
   }
+
+  describe('all', function () {
+    it('should get all instances', function () {
+      $httpBackend.expectGET('/cars')
+        .respond([
+          {id: 1, name: 'Super Car!'},
+          {id: 2, name: 'Another Car!'}
+        ]);
+      var cars;
+      Car.all().then(function (response) {
+        cars = response;
+      });
+      $httpBackend.flush();
+      expect(cars instanceof Collection).toBe(true);
+      expect(cars.length).toBe(2);
+      expect(_.map(cars, 'name')).toEqual(['Super Car!', 'Another Car!']);
+    });
+  });
+
+  describe('find', function () {
+    it('should load a single model', function () {
+      $httpBackend.expectGET('/cars/1')
+        .respond({id: 1, name: 'Super Car!'});
+      Car.find(1).then(function (car) {
+        testCar = car;
+      });
+      $httpBackend.flush();
+      expect(testCar.$toJson()).toEqual({id: 1, name: 'Super Car!'});
+      expect(testCar.$pristine).toBe(true);
+    });
+  });
+
+  describe('where', function () {
+    it('should load multiple models matching a criteria', function () {
+      $httpBackend.expectGET('/cars?status=ACTIVE')
+        .respond([
+          {id: 1, name: 'Super Car!'},
+          {id: 2, name: 'Another Car!'}
+        ]);
+      var cars;
+      Car.where({status: 'ACTIVE'}).then(function (response) {
+        cars = response;
+      });
+      $httpBackend.flush();
+      expect(cars instanceof Collection).toBe(true);
+      expect(cars.length).toBe(2);
+      expect(cars[0].name).toEqual('Super Car!');
+    });
+  });
 
   describe('constructor', function () {
     it('should create a new instance of the model', function () {
@@ -55,6 +95,18 @@ describe('dougal.Model', function () {
       testCar.name = 'New value';
       testCar.$clear();
       expect(testCar.name).toEqual('Super Car!');
+      expect(testCar.$pristine).toBe(true);
+    });
+  });
+
+  describe('$fetch', function () {
+    it('should fetch data for a single model', function () {
+      $httpBackend.expectGET('/cars/1')
+        .respond({id: 1, name: 'Super Car!'});
+      testCar = new Car({id: 1});
+      testCar.$fetch();
+      $httpBackend.flush();
+      expect(testCar.$toJson()).toEqual({id: 1, name: 'Super Car!'});
       expect(testCar.$pristine).toBe(true);
     });
   });
