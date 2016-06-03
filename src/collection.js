@@ -50,6 +50,17 @@ function CollectionFactory() {
       _.each(data, _.bind(function (values) {
         this.push(new this.Model(values));
       }, this));
+    },
+
+    /**
+     * @instance
+     * @memberof module:dougal.Collection
+     * @since NEXT_VERSION
+     */
+    toJson: function () {
+      return _.map(this, function (model) {
+        return model.$toJson();
+      });
     }
   });
 

@@ -1,11 +1,12 @@
 describe('dougal.Model', function () {
 
-  var Model, Car, BasicCar, testCar, defaultOptions, $httpBackend, $rootScope;
+  var Model, Car, Collection, BasicCar, testCar, defaultOptions, $httpBackend, $rootScope;
 
   beforeEach(module('dougal'));
 
   beforeEach(inject(function ($injector) {
     BasicCar = $injector.get('BasicCar');
+    Collection = $injector.get('Collection');
     Model = $injector.get('Model');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
@@ -25,11 +26,34 @@ describe('dougal.Model', function () {
   }
 
   describe('all', function () {
-    // TODO
+    it('should get all instances', function () {
+      $httpBackend.expectGET('/cars')
+        .respond([
+          {id: 1, name: 'Super Car!'},
+          {id: 2, name: 'Another Car!'}
+        ]);
+      var cars;
+      Car.all().then(function (response) {
+        cars = response;
+      });
+      $httpBackend.flush();
+      expect(cars instanceof Collection).toBe(true);
+      expect(cars.length).toBe(2);
+      expect(_.map(cars, 'name')).toEqual(['Super Car!', 'Another Car!']);
+    });
   });
 
   describe('find', function () {
-    // TODO
+    it('should load a single model', function () {
+      $httpBackend.expectGET('/cars/1')
+        .respond({id: 1, name: 'Super Car!'});
+      Car.find(1).then(function (car) {
+        testCar = car;
+      });
+      $httpBackend.flush();
+      expect(testCar.$toJson()).toEqual({id: 1, name: 'Super Car!'});
+      expect(testCar.$pristine).toBe(true);
+    });
   });
 
   describe('constructor', function () {
@@ -58,7 +82,15 @@ describe('dougal.Model', function () {
   });
 
   describe('$fetch', function () {
-    // TODO
+    it('should fetch data for a single model', function () {
+      $httpBackend.expectGET('/cars/1')
+        .respond({id: 1, name: 'Super Car!'});
+      testCar = new Car({id: 1});
+      testCar.$fetch();
+      $httpBackend.flush();
+      expect(testCar.$toJson()).toEqual({id: 1, name: 'Super Car!'});
+      expect(testCar.$pristine).toBe(true);
+    });
   });
 
   describe('$get', function () {
