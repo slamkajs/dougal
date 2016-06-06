@@ -76,8 +76,8 @@ function ModelFactory($q) {
      */
     $fetch: function () {
       return this.$$store.fetch(this)
-        .then(_.bind(function (response) {
-          this.$parse(response.data);
+        .then(_.bind(function (data) {
+          this.$parse(data);
           return this;
         }, this));
     },
@@ -177,8 +177,8 @@ function ModelFactory($q) {
     $save: function () {
       return this.$validate()
         .then(_.bind(function () {
-          function callback(response) {
-            this.$parse(response.data);
+          function callback(data) {
+            this.$parse(data);
             return this;
           }
 
