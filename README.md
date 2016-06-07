@@ -8,7 +8,7 @@
 The missing M of MVC for Angular.js applications, based on ActiveRecord and Backbone patterns.
 
 [GitHub](https://github.com/aol/dougal) |
-[Documentation](http://aol.github.io/dougal/) |
+[Documentation](http://aol.github.io/dougal/doc/) |
 [Report issue](https://github.com/aol/dougal/issues)
 
 ## Getting started
