@@ -50,7 +50,7 @@ function HttpStoreFactory($http, $interpolate) {
       return this.http({
         url: this.baseUrl.index(criteria),
         method: 'GET',
-        params: criteria
+        params: _.omit(criteria, this.baseUrl.index.expressions)
       });
     },
 

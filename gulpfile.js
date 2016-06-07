@@ -24,7 +24,8 @@ paths.allFiles = _.flatten([paths.src, paths.tests]);
 
 gulp.task('default', ['doc', 'lint:unsafe', 'dist'], function () {
   gulp.start('watch:test');
-  return gulp.watch(paths.allFiles, ['doc', 'lint:unsafe', 'dist']);
+  gulp.watch(paths.allFiles, ['lint:unsafe']);
+  return gulp.watch(paths.src, ['doc', 'dist']);
 });
 
 gulp.task('dist', function () {

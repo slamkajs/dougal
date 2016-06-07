@@ -48,7 +48,7 @@ describe('dougal.HttpStore', function () {
   });
 
   describe('list', function () {
-    it('should perform a GET request', function () {
+    it('should perform a GET request with parameters', function () {
       $httpBackend.expectGET('/cars?color=red')
         .respond([{id: 1, name: 'Super Car!'}]);
       store.list({color: 'red'})
@@ -56,6 +56,15 @@ describe('dougal.HttpStore', function () {
           expect(response).toEqual([{id: 1, name: 'Super Car!'}])
         })
         .catch(fail);
+      $httpBackend.flush();
+    });
+
+    it('should not pass URL parameters twice', function () {
+      $httpBackend.expectGET('/cars/1/parts?type=tyre').respond([]);
+      store = new HttpStore({
+        baseUrl: '/cars/{{carId}}/parts'
+      });
+      store.list({carId: 1, type: 'tyre'}).catch(fail);
       $httpBackend.flush();
     });
   });

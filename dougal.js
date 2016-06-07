@@ -1,5 +1,5 @@
 /**
- * Dougal v0.2.0
+ * Dougal v0.3.0
  * (c) 2016 AOL
  * Licence: Apache-2.0
  */
@@ -515,7 +515,7 @@ function HttpStoreFactory($http, $interpolate) {
       return this.http({
         url: this.baseUrl.index(criteria),
         method: 'GET',
-        params: criteria
+        params: _.omit(criteria, this.baseUrl.index.expressions)
       });
     },
 
