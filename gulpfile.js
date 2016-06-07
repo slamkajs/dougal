@@ -20,9 +20,11 @@ var paths = {
   tests: 'test/*-spec.js'
 };
 
+paths.allFiles = _.flatten([paths.src, paths.tests]);
+
 gulp.task('default', ['doc', 'lint:unsafe', 'dist'], function () {
   gulp.start('watch:test');
-  return gulp.watch(paths.src, ['doc', 'lint:unsafe', 'dist']);
+  return gulp.watch(paths.allFiles, ['doc', 'lint:unsafe', 'dist']);
 });
 
 gulp.task('dist', function () {
@@ -35,14 +37,14 @@ gulp.task('dist', function () {
 gulp.task('doc', shell.task('./node_modules/.bin/jsdoc --configure jsdoc.conf.json --destination doc'));
 
 gulp.task('lint', function () {
-  return gulp.src(_.flatten([paths.src, paths.tests]))
+  return gulp.src(paths.allFiles)
     .pipe(eslint('./.eslintrc'))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
 
 gulp.task('lint:unsafe', function () {
-  return gulp.src(paths.src)
+  return gulp.src(paths.allFiles)
     .pipe(eslint('./.eslintrc'))
     .pipe(eslint.format());
 });

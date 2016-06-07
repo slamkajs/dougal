@@ -1,6 +1,6 @@
 describe('dougal.HttpStore', function () {
 
-  var Car, HttpStore, store, $httpBackend, $rootScope;
+  var Car, HttpStore, store, $httpBackend;
 
   beforeEach(module('dougal'));
 
@@ -8,7 +8,6 @@ describe('dougal.HttpStore', function () {
     Car = $injector.get('BasicCar');
     HttpStore = $injector.get('HttpStore');
     $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
 
     store = new HttpStore({
       baseUrl: '/cars',
@@ -49,8 +48,16 @@ describe('dougal.HttpStore', function () {
   });
 
   describe('list', function () {
-    xit('should perform a GET request', function () {
-    }).pend('TODO');
+    it('should perform a GET request', function () {
+      $httpBackend.expectGET('/cars?color=red')
+        .respond([{id: 1, name: 'Super Car!'}]);
+      store.list({color: 'red'})
+        .then(function (response) {
+          expect(response).toEqual([{id: 1, name: 'Super Car!'}])
+        })
+        .catch(fail);
+      $httpBackend.flush();
+    });
   });
 
   describe('update', function () {

@@ -1,14 +1,12 @@
 describe('dougal.Collection', function () {
 
-  var Collection, Car, cars, $httpBackend, $rootScope;
+  var Collection, Car, cars;
 
   beforeEach(module('dougal'));
 
   beforeEach(inject(function ($injector) {
     Collection = $injector.get('Collection');
     Car = $injector.get('BasicCar');
-    $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
 
     cars = new Collection({model: Car});
   }));
@@ -18,7 +16,7 @@ describe('dougal.Collection', function () {
   });
 
   it('should accept values by default', function () {
-    car = new Collection({
+    var car = new Collection({
       model: Car,
       data: [{id: 1, name: 'Super Car!'}]
     });
