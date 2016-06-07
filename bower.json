@@ -5,7 +5,7 @@
   "authors": [
     "Emmanuel Bourgerie <manu@bourgerie.fr>"
   ],
-  "description": "The M of MVC for Angular.js applications",
+  "description": "The missing M of MVC for Angular.js applications",
   "main": "dougal.js",
   "moduleType": [],
   "keywords": [

@@ -1,7 +1,6 @@
 {
   "plugins": [
     "angular",
-    "jasmine",
     "lodash"
   ],
   "extends": ["eslint:recommended"],

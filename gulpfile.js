@@ -1,6 +1,7 @@
 'use strict';
 
-var gulp = require('gulp'),
+var _ = require('lodash'),
+    gulp = require('gulp'),
     concat = require('gulp-concat'),
     eslint = require('gulp-eslint'),
     Server = require('karma').Server,
@@ -34,7 +35,7 @@ gulp.task('dist', function () {
 gulp.task('doc', shell.task('./node_modules/.bin/jsdoc --configure jsdoc.conf.json --destination doc'));
 
 gulp.task('lint', function () {
-  return gulp.src(paths.src)
+  return gulp.src(_.flatten([paths.src, paths.tests]))
     .pipe(eslint('./.eslintrc'))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
