@@ -33,7 +33,7 @@ function CollectionFactory() {
    * * `data` (optional)
    * @constructor
    * @memberof module:dougal
-   * @since NEXT_VERSION
+   * @since 0.3.0
    */
   function Collection(options) {
     Array.call(this);
@@ -50,7 +50,7 @@ function CollectionFactory() {
     /**
      * @instance
      * @memberof module:dougal.Collection
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     clear: function () {
       this.length = 0;
@@ -60,7 +60,7 @@ function CollectionFactory() {
      * @instance
      * @param data {Array}
      * @memberof module:dougal.Collection
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     parse: function (data) {
       this.clear();
@@ -72,7 +72,7 @@ function CollectionFactory() {
     /**
      * @instance
      * @memberof module:dougal.Collection
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     toJson: function () {
       return _.map(this, function (model) {
@@ -276,7 +276,7 @@ function ModelFactory($q) {
     },
 
     /**
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     $fetch: function () {
       return this.$$store.fetch(this)
@@ -481,7 +481,7 @@ function HttpStoreFactory($http, $interpolate) {
    * @param options
    * @class
    * @memberof module:dougal
-   * @since NEXT_VERSION
+   * @since 0.3.0
    */
   function HttpStore(options) {
     this.baseUrl = {
@@ -541,7 +541,7 @@ function HttpStoreFactory($http, $interpolate) {
      * // works with all attributes:
      * partsStore.url(new CarPart({carId: 123, id: 456}));
      * // /cars/123/parts/456 => baseUrl: /cars/{{carId}}/parts/{{id}}
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     url: function (model) {
       if (model.$isNew()) {

@@ -72,7 +72,7 @@ function ModelFactory($q) {
     },
 
     /**
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     $fetch: function () {
       return this.$$store.fetch(this)

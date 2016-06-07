@@ -16,7 +16,7 @@ function HttpStoreFactory($http, $interpolate) {
    * @param options
    * @class
    * @memberof module:dougal
-   * @since NEXT_VERSION
+   * @since 0.3.0
    */
   function HttpStore(options) {
     this.baseUrl = {
@@ -76,7 +76,7 @@ function HttpStoreFactory($http, $interpolate) {
      * // works with all attributes:
      * partsStore.url(new CarPart({carId: 123, id: 456}));
      * // /cars/123/parts/456 => baseUrl: /cars/{{carId}}/parts/{{id}}
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     url: function (model) {
       if (model.$isNew()) {

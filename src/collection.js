@@ -16,7 +16,7 @@ function CollectionFactory() {
    * * `data` (optional)
    * @constructor
    * @memberof module:dougal
-   * @since NEXT_VERSION
+   * @since 0.3.0
    */
   function Collection(options) {
     Array.call(this);
@@ -33,7 +33,7 @@ function CollectionFactory() {
     /**
      * @instance
      * @memberof module:dougal.Collection
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     clear: function () {
       this.length = 0;
@@ -43,7 +43,7 @@ function CollectionFactory() {
      * @instance
      * @param data {Array}
      * @memberof module:dougal.Collection
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     parse: function (data) {
       this.clear();
@@ -55,7 +55,7 @@ function CollectionFactory() {
     /**
      * @instance
      * @memberof module:dougal.Collection
-     * @since NEXT_VERSION
+     * @since 0.3.0
      */
     toJson: function () {
       return _.map(this, function (model) {
