@@ -48,10 +48,10 @@ function extendModel(Collection, HttpStore, Model) {
        * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Collection|Collection}
        */
       all: function () {
-        return ExtendedModel.prototype.$$store.list({}).then(function (response) {
+        return ExtendedModel.prototype.$$store.list({}).then(function (data) {
           return new Collection({
             model: ExtendedModel,
-            data: response.data
+            data: data
           });
         });
       },
@@ -76,10 +76,10 @@ function extendModel(Collection, HttpStore, Model) {
        * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Collection|Collection}
        */
       where: function (options) {
-        return ExtendedModel.prototype.$$store.list(options).then(function (response) {
+        return ExtendedModel.prototype.$$store.list(options).then(function (data) {
           return new Collection({
             model: ExtendedModel,
-            data: response.data
+            data: data
           });
         });
       }

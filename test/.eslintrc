@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    "jasmine"
+  ],
+  "extends": [
+    "../.eslintrc",
+    "plugin:jasmine/recommended"
+  ],
+  "env": {
+    "jasmine": true
+  },
+  "globals": {
+    "module": true,
+    "inject": true
+  }
+}

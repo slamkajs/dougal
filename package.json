@@ -1,7 +1,7 @@
 {
   "name": "dougal",
   "version": "0.2.0",
-  "description": "The M of MVC for Angular.js applications",
+  "description": "The missing M of MVC for Angular.js applications",
   "main": "dougal.js",
   "scripts": {
     "dist": "./node_modules/.bin/gulp dist",

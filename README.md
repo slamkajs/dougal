@@ -5,7 +5,7 @@
 [![Build status](https://img.shields.io/travis/aol/dougal/master.svg?maxAge=2592000)](https://travis-ci.org/aol/dougal)
 [![Coveralls branch](https://img.shields.io/coveralls/aol/dougal/master.svg?maxAge=2592000)](https://coveralls.io/github/aol/dougal)
 
-The M of MVC for Angular.js applications, based on ActiveRecord and Backbone patterns.
+The missing M of MVC for Angular.js applications, based on ActiveRecord and Backbone patterns.
 
 [GitHub](https://github.com/aol/dougal) |
 [Documentation](http://aol.github.io/dougal/) |

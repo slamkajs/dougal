@@ -134,10 +134,10 @@ function extendModel(Collection, HttpStore, Model) {
        * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Collection|Collection}
        */
       all: function () {
-        return ExtendedModel.prototype.$$store.list({}).then(function (response) {
+        return ExtendedModel.prototype.$$store.list({}).then(function (data) {
           return new Collection({
             model: ExtendedModel,
-            data: response.data
+            data: data
           });
         });
       },
@@ -162,10 +162,10 @@ function extendModel(Collection, HttpStore, Model) {
        * @returns {Promise} The promise resolves to an instance of {@link module:dougal.Collection|Collection}
        */
       where: function (options) {
-        return ExtendedModel.prototype.$$store.list(options).then(function (response) {
+        return ExtendedModel.prototype.$$store.list(options).then(function (data) {
           return new Collection({
             model: ExtendedModel,
-            data: response.data
+            data: data
           });
         });
       }
@@ -280,8 +280,8 @@ function ModelFactory($q) {
      */
     $fetch: function () {
       return this.$$store.fetch(this)
-        .then(_.bind(function (response) {
-          this.$parse(response.data);
+        .then(_.bind(function (data) {
+          this.$parse(data);
           return this;
         }, this));
     },
@@ -381,8 +381,8 @@ function ModelFactory($q) {
     $save: function () {
       return this.$validate()
         .then(_.bind(function () {
-          function callback(response) {
-            this.$parse(response.data);
+          function callback(data) {
+            this.$parse(data);
             return this;
           }
 
@@ -498,14 +498,21 @@ function HttpStoreFactory($http, $interpolate) {
     },
 
     fetch: function (model) {
-      return $http({
+      return this.http({
         url: this.url(model),
         method: 'GET'
       });
     },
 
+    http: function (options) {
+      return $http(options)
+        .then(function (response) {
+          return response.data;
+        });
+    },
+
     list: function (criteria) {
-      return $http({
+      return this.http({
         url: this.baseUrl.index(criteria),
         method: 'GET',
         params: criteria
@@ -513,7 +520,7 @@ function HttpStoreFactory($http, $interpolate) {
     },
 
     sync: function (method, model) {
-      return $http({
+      return this.http({
         data: model.$toJson(),
         method: method,
         url: this.url(model)

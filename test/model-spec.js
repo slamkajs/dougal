@@ -32,7 +32,7 @@ describe('dougal.Model', function () {
           {id: 1, name: 'Super Car!'},
           {id: 2, name: 'Another Car!'}
         ]);
-      var cars;
+      var cars = null;
       Car.all().then(function (response) {
         cars = response;
       });
