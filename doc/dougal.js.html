@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: dougal.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: dougal.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Dougal v0.2.0
+ * (c) 2016 AOL
+ * Licence: Apache-2.0
+ */
+(function () { 'use strict';
+
+var __extends = (this &amp;&amp; this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Dougal;
+(function (Dougal) {
+    /**
+     * Default Angular module for Dougal
+     *
+     * @module dougal
+     * @example
+     * angular.module('your.app', ['dougal']);
+     * @since 0.1.0
+     */
+    angular.module('dougal', []);
+})(Dougal || (Dougal = {}));
+/// &lt;reference path="module.ts" />
+var Dougal;
+(function (Dougal) {
+    angular.module('dougal').factory('Model', ModelFactory);
+    ModelFactory.$inject = ['HttpStore', '$q'];
+    function ModelFactory(HttpStore, $q) {
+        var Model = (function () {
+            /**
+             * Default constructor. Should never be called directly, but through an implementation using
+             * {@link module:dougal.Model.extend|Model.extend()}.
+             *
+             * @protected
+             * @param values {Object} default values for the model
+             * @class
+             * @memberof module:dougal
+             * @since 0.1.0
+             */
+            function Model(values) {
+                /**
+                 * @example
+                 * var car = new Car({name: 'Super Car!'});
+                 * car.errors; // {}
+                 * car.name = '';
+                 * car.errors; // {name: 'Name cannot be empty'}
+                 * @since 0.1.0
+                 */
+                this.$errors = {};
+                /**
+                 * Boolean property to indicate if a model has changed values.
+                 * @example
+                 * var car = new Car({name: 'Super Car!'});
+                 * car.$pristine; // true
+                 * car.name = 'New Name!';
+                 * car.$pristine; // false
+                 * @since 0.1.0
+                 */
+                this.$pristine = true;
+                /**
+                 * Is true if all attributes are valid. Unlike [$hasError]{@link Model#$hasError}, it covers all values, changed
+                 * or not.
+                 * @since 0.1.0
+                 */
+                this.$valid = true;
+                this.$$changed = {};
+                this.$$previousValues = {};
+                this.$$values = {};
+                this.$parse(values);
+            }
+            /**
+             * Creates a new model that inherits from the {@link module:dougal.Model|Model} class.
+             *
+             * @static
+             * @function
+             * @param options {Object}
+             * `attributes` (Object) describes each attribute of the model with the following options:
+             * * `$get`
+             * * `$set`
+             * * `$validate`
+             *
+             * `baseUrl` (String)
+             *
+             * `idAttribute` (String) overrides the attribute used for {@link module:dougal.Model#$id|$id}
+             *
+             * `initialize` (Function)
+             * @memberof module:dougal
+             * @returns {ExtendedModel}
+             * @since 0.1.0
+             */
+            Model.extend = function (options) {
+                var ExtendedModel = (function (_super) {
+                    __extends(ExtendedModel, _super);
+                    function ExtendedModel(values) {
+                        _super.call(this, values);
+                        if (options.initialize) {
+                            options.initialize.apply(this, arguments);
+                        }
+                    }
+                    return ExtendedModel;
+                }(Model));
+                options.idAttribute = options.idAttribute || 'id';
+                _.assign(ExtendedModel.prototype, {
+                    $$idAttribute: options.idAttribute,
+                    $$options: options,
+                    $$store: new HttpStore(options)
+                });
+                _.each(options.attributes, function (attribute, key) {
+                    Object.defineProperty(ExtendedModel.prototype, key, {
+                        get: function () {
+                            function $super() {
+                                return this.$get(key);
+                            }
+                            if (attribute.$get) {
+                                return attribute.$get.call(this, $super.bind(this));
+                            }
+                            else {
+                                return $super.call(this);
+                            }
+                        },
+                        set: function (value) {
+                            function $super(value) {
+                                return this.$set(key, value);
+                            }
+                            if (attribute.$set) {
+                                return attribute.$set.call(this, value, $super.bind(this));
+                            }
+                            else {
+                                return $super.call(this, value);
+                            }
+                        }
+                    });
+                });
+                return ExtendedModel;
+            };
+            /**
+             * Reverts the current changes to the last known state.
+             *
+             * @see {@link module:dougal.Model#$reset|$reset()}
+             * @example
+             * var car = new Car({name: 'Super Car!'});
+             * car.name = 'New Name!';
+             * car.$clear();
+             * car.name; // 'Super Car!';
+             * car.$pristine; // true
+             * @since 0.1.0
+             */
+            Model.prototype.$clear = function () {
+                this.$$changed = {};
+                this.$$values = _.clone(this.$$previousValues, true);
+                this.$errors = {};
+                this.$pristine = true;
+            };
+            /**
+             * @returns current value of an attribute from the model
+             *
+             * @param key {String}
+             * @example car.$get('name')
+             * @since 0.1.0
+             */
+            Model.prototype.$get = function (key) {
+                return this.$$values[key];
+            };
+            /**
+             * @returns {boolean} true if the value is invalid
+             *
+             * @param key {String}
+             * @example
+             * var car = new Car({name: ''});
+             * car.$hasError('name'); // false
+             * car.name = '  ';
+             * car.$hasError('name'); // true
+             * @since 0.1.0
+             */
+            Model.prototype.$hasError = function (key) {
+                return angular.isDefined(this.$errors[key]);
+            };
+            /**
+             * @returns a unique ID for that model. By default, the `id` attribute, but can be overriden by the `idAttribute`
+             * option in [extend]{@link Model.extend}.
+             * @since 0.1.1
+             */
+            Model.prototype.$id = function () {
+                return this.$$values[this.$$idAttribute];
+            };
+            /**
+             * @returns {boolean} true if the model has an ID
+             * @example
+             * new Car({}).$isNew();        // true
+             * new Car({id: 123}).$isNew(); // false
+             * @since 0.1.1
+             */
+            Model.prototype.$isNew = function () {
+                return angular.isUndefined(this.$id());
+            };
+            Model.prototype.$$normalizeToPromise = function (value) {
+                return $q.when(value).then(function (value) {
+                    return value === true || $q.reject(value);
+                });
+            };
+            /**
+             * (soon)
+             *
+             * @param values
+             * @since 0.2.0
+             */
+            Model.prototype.$parse = function (values) {
+                _.assign(this.$$values, values);
+                this.$reset();
+            };
+            /**
+             * Saves the current state as the last known.
+             *
+             * @see {@link module:dougal.Model#$clear|$clear()}
+             * @example
+             * var car = new Car({name: 'Super Car!'});
+             * car.name = 'New Name!';
+             * car.$reset();
+             * car.name; // 'New Name!';
+             * car.$pristine; // true
+             * @since 0.1.0
+             */
+            Model.prototype.$reset = function () {
+                this.$$changed = {};
+                this.$$previousValues = _.clone(this.$$values, true);
+                this.$errors = {};
+                this.$pristine = true;
+            };
+            /**
+             * Saves modifications made to the given model.
+             *
+             * @returns {Promise}
+             * @since 0.2.0
+             */
+            Model.prototype.$save = function () {
+                var _this = this;
+                return this.$validate()
+                    .then(function () {
+                    function callback(response) {
+                        this.$parse(response.data);
+                        return this;
+                    }
+                    if (_this.$isNew()) {
+                        return _this.$$store.create(_this).then(callback.bind(_this));
+                    }
+                    else {
+                        return _this.$$store.update(_this).then(callback.bind(_this));
+                    }
+                });
+            };
+            /**
+             * Set the value of an attribute from the model. Changing any value will set `$pristine` to false and trigger a
+             * validation call, even if you revert to its original value.
+             *
+             * @param key {String}
+             * @param value
+             * @example car.$set('name', 'Super Car!')
+             * @since 0.1.0
+             */
+            Model.prototype.$set = function (key, value) {
+                this.$pristine = false;
+                this.$$changed[key] = value;
+                this.$$values[key] = value;
+                this.$$validateAttribute(key);
+            };
+            /**
+             * @returns {object} a copy of the object attributes
+             * @example
+             * new Car({id: 123, name: 'Super Car!', color: 'blue'}).toJson();
+             * // {id: 123, name: 'Super Car!', color: 'blue'}
+             * @since 0.2.0
+             */
+            Model.prototype.$toJson = function () {
+                return _.pick(this.$$values, _.keys(this.$$options.attributes));
+            };
+            /**
+             * Validates the values of the model
+             *
+             * @param options
+             * @returns {Promise}
+             * @since 0.1.0
+             */
+            Model.prototype.$validate = function (options) {
+                var _this = this;
+                if (_.isString(options)) {
+                    return this.$$validateAttribute(options);
+                }
+                return $q
+                    .all(_.map(this.$$options.attributes, function (value, key) {
+                    return _this.$$validateAttribute(key);
+                }))
+                    .catch(function () {
+                    return $q.reject(_this.$errors);
+                });
+            };
+            Model.prototype.$$validateAttribute = function (key) {
+                var _this = this;
+                var validator = this.$$options.attributes[key].$validate || _.constant(true);
+                return this.$$normalizeToPromise(validator.call(this, this.$$values[key]))
+                    .then(function () {
+                    delete _this.$errors[key];
+                })
+                    .catch(function (errorMessage) {
+                    return $q.reject(_this.$errors[key] = errorMessage);
+                })
+                    .finally(function () {
+                    _this.$valid = _.isEmpty(_this.$errors);
+                });
+            };
+            return Model;
+        }());
+        Dougal.Model = Model;
+        return Model;
+    }
+})(Dougal || (Dougal = {}));
+/// &lt;reference path="module.ts" />
+var Dougal;
+(function (Dougal) {
+    angular.module('dougal').factory('HttpStore', HttpStoreFactory);
+    HttpStoreFactory.$inject = ['$http', '$interpolate'];
+    function HttpStoreFactory($http, $interpolate) {
+        /**
+         * HTTP storage layer
+         *
+         * | Action | URL | Method |
+         * |--------|-----|--------|
+         * | Index | `/cars` | GET |
+         * | Fetch | `/cars/:id` | GET |
+         * | Create | `/cars` | POST |
+         * | Update | `/cars/:id` | PUT |
+         * | Delete | `/cars/:id` | DELETE |
+         *
+         * @param options
+         * @class
+         * @memberof module:dougal
+         * @since NEXT_VERSION
+         */
+        var HttpStore = (function () {
+            function HttpStore(options) {
+                this.baseUrl = {
+                    index: $interpolate(options.baseUrl),
+                    fetch: $interpolate(options.baseUrl + '/{{' + options.idAttribute + '}}')
+                };
+            }
+            HttpStore.prototype.create = function (model) {
+                return this.sync('POST', model);
+            };
+            HttpStore.prototype.sync = function (method, model) {
+                return $http({
+                    data: model.$toJson(),
+                    method: method,
+                    url: this.url(model)
+                });
+            };
+            HttpStore.prototype.update = function (model) {
+                return this.sync('PUT', model);
+            };
+            /**
+             * @returns {String} URL for the model using Angular's `$interpolate` and the model's attributes.
+             * @param model
+             * @see {@link module:dougal.Model#$toJson|$toJson()}
+             * @example
+             * store.url(new Car()); // /cars
+             * store.url(new Car({id: 123})); // /cars/123
+             * // works with all attributes:
+             * partsStore.url(new CarPart({carId: 123, id: 456}));
+             * // /cars/123/parts/456 => baseUrl: /cars/{{carId}}/parts/{{id}}
+             * @since NEXT_VERSION
+             */
+            HttpStore.prototype.url = function (model) {
+                if (model.$isNew()) {
+                    return this.baseUrl.index(model.$toJson());
+                }
+                else {
+                    return this.baseUrl.fetch(model.$toJson());
+                }
+            };
+            return HttpStore;
+        }());
+        Dougal.HttpStore = HttpStore;
+        return HttpStore;
+    }
+})(Dougal || (Dougal = {}));
+
+
+})();</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-dougal.html">dougal</a></li></ul><h3>Classes</h3><ul><li><a href="module-dougal.HttpStore.html">HttpStore</a></li><li><a href="module-dougal.Model.html">Model</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Jun 01 2016 13:06:38 GMT+0100 (IST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
