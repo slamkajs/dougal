@@ -66,6 +66,31 @@ angular.module('your.app').controller('CarController', function (Car) {
 
 And voilà!
 
+## Basic CRUD operations
+
+| Action  | Method               | HTTP           | Comment        |
+|---------|----------------------|----------------|----------------|
+| List    | Car.all, Car.where   | GET /cars      |                |
+| Create  | Car.$save            | POST /cars     | See Car.$isNew |
+| Fetch   | Car.find, Car.$fetch | GET /cars/1    |                |
+| Update  | Car.$save            | PUT /cars/1    | See Car.$isNew |
+| Destroy | Car.$delete          | DELETE /cars/1 |                |
+
+## Validations
+
+If `$validate` is present, it can be implemented in two ways:
+
+* It can return either `true`, or a error message as a string if the attribute is invalid.
+* It can return a promise for more complex cases, and if rejected it expects an error message.
+
 ## Contribute
 
-    $ gulp test
+See [issues](https://github.com/aol/dougal/issues) if you have found a bug, or want to help improving Dougal.
+
+Locally, you can run:
+
+```
+$ gulp
+```
+
+Which will run tests, linting, provide coverage report, and produce the concatenated `dougal.js` file.
