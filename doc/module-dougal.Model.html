@@ -413,7 +413,7 @@ or not.</p>
 
 
 <div class="description">
-    <p>(soon)</p>
+    <p>Retrieves all instances of the model</p>
 </div>
 
 
@@ -457,7 +457,7 @@ or not.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line50">line 50</a>
+        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -504,6 +504,14 @@ or not.</p>
     
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Car.all().then(function (cars) {
+  cars.length; // 1
+  instanceof cars[0]; // Car
+});</code></pre>
+
+
 
         
             
@@ -518,6 +526,26 @@ or not.</p>
 
 <div class="description">
     <p>Creates a new model that inherits from the <a href="module-dougal.Model.html">Model</a> class.</p>
+<h4>Attributes properties</h4><p><strong><code>$get</code></strong> custom getter for the attribute. The <code>$super</code> parameter is for convenient overriding.</p>
+<pre class="prettyprint source lang-javascript"><code>$get: function ($super) {
+  return '+' + $super() + '+';
+}</code></pre><p><strong><code>$set</code></strong> custom setter for the attribute. The <code>$super</code> parameter is for convenient overriding.</p>
+<pre class="prettyprint source lang-javascript"><code>$set: function (value, $super) {
+  $super(_.trim(value));
+}</code></pre><p><strong><code>$validate</code></strong> validation method for the attribute.
+For complex validations, can return a promise.
+For simple validations, can return <code>true</code> or a string/an object if not.</p>
+<pre class="prettyprint source lang-javascript"><code>$validate: function (value) {
+  return someCheck(value) ? true : 'The value is invalid because &lt;reason>';
+  // or
+  var deferred = $q.defer();
+  if (someCheck(true)) {
+    deferred.resolve();
+  } else {
+    deferred.reject('The value is invalid because &lt;reason>');
+  }
+  return deferred.promise;
+}</code></pre>
 </div>
 
 
@@ -569,15 +597,10 @@ or not.</p>
 
             
 
-            <td class="description last"><p><code>attributes</code> (Object) describes each attribute of the model with the following options:</p>
-<ul>
-<li><code>$get</code></li>
-<li><code>$set</code></li>
-<li><code>$validate</code></li>
-</ul>
-<p><code>baseUrl</code> (String)</p>
+            <td class="description last"><p><code>attributes</code> (Object) describes each attribute of the model. See above for details.</p>
+<p><code>baseUrl</code> (String) will be interpolated with the model's attributes</p>
 <p><code>idAttribute</code> (String) overrides the attribute used for <a href="module-dougal.Model.html#$id">$id</a></p>
-<p><code>initialize</code> (Function)</p></td>
+<p><code>initialize</code> (Function) constructor inheritance</p></td>
         </tr>
 
     
@@ -621,7 +644,7 @@ or not.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line26">line 26</a>
+        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line58">line 58</a>
     </li></ul></dd>
     
 
@@ -677,7 +700,7 @@ or not.</p>
 
 
 <div class="description">
-    <p>(soon)</p>
+    <p>Find an instance by ID</p>
 </div>
 
 
@@ -770,7 +793,7 @@ or not.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line66">line 66</a>
+        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line112">line 112</a>
     </li></ul></dd>
     
 
@@ -817,20 +840,30 @@ or not.</p>
     
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Car.find(1).then(function (car) {
+  instanceof car; // Car
+});
+// Equivalent:
+var car = new Car({id: 1});
+car.$fetch();</code></pre>
+
+
 
         
             
 
     
 
-    <h4 class="name" id=".where"><span class="type-signature">(static) </span>where<span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id=".where"><span class="type-signature">(static) </span>where<span class="signature">(options)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>(soon)</p>
+    <p>Searches for instances matching <code>options</code></p>
 </div>
 
 
@@ -839,6 +872,55 @@ or not.</p>
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">any</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -874,7 +956,7 @@ or not.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line78">line 78</a>
+        <a href="extend.js.html">extend.js</a>, <a href="extend.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -919,6 +1001,14 @@ or not.</p>
 </dl>
 
     
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>Car.where({some: 'filter'}).then(function (cars) {
+  cars.length; // 1
+  instanceof cars[0]; // Car
+});</code></pre>
 
 
 
@@ -2379,7 +2469,7 @@ validation call, even if you revert to its original value.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 07 2016 09:27:44 GMT+0100 (IST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Jun 22 2016 14:06:34 GMT+0100 (IST)
 </footer>
 
 <script> prettyPrint(); </script>
