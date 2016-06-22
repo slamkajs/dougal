@@ -1,3 +1,6 @@
+var _ = require('lodash'),
+    angular = require('angular');
+
 angular.module('dougal').factory('HttpStore', HttpStoreFactory);
 
 HttpStoreFactory.$inject = ['$http', '$interpolate'];
@@ -86,6 +89,8 @@ function HttpStoreFactory($http, $interpolate) {
       }
     }
   };
+
+  module.exports = HttpStore;
 
   return HttpStore;
 }

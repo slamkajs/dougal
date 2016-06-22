@@ -2,11 +2,11 @@
 
 var _ = require('lodash'),
     gulp = require('gulp'),
-    concat = require('gulp-concat'),
+    browserify = require('gulp-browserify'),
     eslint = require('gulp-eslint'),
+    rename = require('gulp-rename'),
     Server = require('karma').Server,
-    shell = require('gulp-shell'),
-    wrap = require('gulp-wrap');
+    shell = require('gulp-shell');
 
 var paths = {
   src: [
@@ -22,16 +22,16 @@ var paths = {
 
 paths.allFiles = _.flatten([paths.src, paths.tests]);
 
-gulp.task('default', ['doc', 'lint:unsafe', 'dist'], function () {
+gulp.task('default', ['doc', 'lint:unsafe'], function () {
   gulp.start('watch:test');
   gulp.watch(paths.allFiles, ['lint:unsafe']);
   return gulp.watch(paths.src, ['doc', 'dist']);
 });
 
 gulp.task('dist', function () {
-  return gulp.src(paths.src)
-    .pipe(concat(paths.dist))
-    .pipe(wrap({src: 'src/wrap.js.tpl'}))
+  return gulp.src('src/module.js')
+    .pipe(browserify())
+    .pipe(rename(paths.dist))
     .pipe(gulp.dest('.'));
 });
 
@@ -50,14 +50,14 @@ gulp.task('lint:unsafe', function () {
     .pipe(eslint.format());
 });
 
-gulp.task('test', function (done) {
+gulp.task('test', ['dist'], function (done) {
   new Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
   }, done).start();
 });
 
-gulp.task('watch:test', function (done) {
+gulp.task('watch:test', ['dist'], function (done) {
   new Server({
     configFile: __dirname + '/karma.conf.js'
   }, done).start();

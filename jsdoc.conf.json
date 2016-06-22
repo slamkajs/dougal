@@ -5,7 +5,6 @@
       "README.md",
       "src/module.js",
       "src/collection.js",
-      "src/extend.js",
       "src/httpStore.js",
       "src/model.js"
     ]

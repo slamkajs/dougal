@@ -18,8 +18,7 @@ module.exports = function(config) {
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'node_modules/lodash/lodash.js',
-      'src/module.js',
-      'src/*.js',
+      'dougal.js',
       'test/*.js'
     ],
 

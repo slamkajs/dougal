@@ -1,3 +1,6 @@
+var _ = require('lodash'),
+    angular = require('angular');
+
 angular.module('dougal').factory('Collection', CollectionFactory);
 
 CollectionFactory.$inject = [];
@@ -63,6 +66,8 @@ function CollectionFactory() {
       });
     }
   });
+
+  module.exports = Collection;
 
   return Collection;
 }

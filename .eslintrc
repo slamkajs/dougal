@@ -3,6 +3,9 @@
     "angular",
     "lodash"
   ],
+  "env": {
+    "commonjs": true
+  },
   "extends": ["eslint:recommended"],
   "globals": {
     "angular": true,
