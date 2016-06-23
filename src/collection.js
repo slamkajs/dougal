@@ -1,7 +1,7 @@
 angular.module('dougal').factory('Collection', CollectionFactory);
 
-CollectionFactory.$inject = [];
-function CollectionFactory() {
+CollectionFactory.$inject = ['$q'];
+function CollectionFactory($q) {
 
   /**
    * Overrides native JS arrays with Dougal specific functions
@@ -40,15 +40,27 @@ function CollectionFactory() {
     },
 
     /**
+     * Parses and adds the returned values. Can be overridden by a property of {@link module:dougal.Model.extend|Model.extend()}:
+     * ```javascript
+     * parseList: function (response) {
+     *   return response.data;
+     * }
+     * ```
+     *
      * @instance
      * @param data {Array}
      * @memberof module:dougal.Collection
+     * @see module:dougal.HttpStore#list
      * @since 0.3.0
      */
     parse: function (data) {
-      this.clear();
-      _.each(data, _.bind(function (values) {
-        this.push(new this.Model(values));
+      var parseList = $q.when(this.Model.prototype.$$options.parseList ?
+        this.Model.prototype.$$options.parseList(data) : data);
+      parseList.then(_.bind(function (data) {
+        this.clear();
+        _.each(data, _.bind(function (values) {
+          this.push(new this.Model(values));
+        }, this));
       }, this));
     },
 
