@@ -17,8 +17,8 @@ angular.module('dougal', []);
 
 angular.module('dougal').factory('Collection', CollectionFactory);
 
-CollectionFactory.$inject = [];
-function CollectionFactory() {
+CollectionFactory.$inject = ['$q'];
+function CollectionFactory($q) {
 
   /**
    * Overrides native JS arrays with Dougal specific functions
@@ -57,15 +57,27 @@ function CollectionFactory() {
     },
 
     /**
+     * Parses and adds the returned values. Can be overridden by a property of {@link module:dougal.Model.extend|Model.extend()}:
+     * ```javascript
+     * parseList: function (response) {
+     *   return response.data;
+     * }
+     * ```
+     *
      * @instance
      * @param data {Array}
      * @memberof module:dougal.Collection
+     * @see module:dougal.HttpStore#list
      * @since 0.3.0
      */
     parse: function (data) {
-      this.clear();
-      _.each(data, _.bind(function (values) {
-        this.push(new this.Model(values));
+      var parseList = $q.when(this.Model.prototype.$$options.parseList ?
+        this.Model.prototype.$$options.parseList(data) : data);
+      parseList.then(_.bind(function (data) {
+        this.clear();
+        _.each(data, _.bind(function (values) {
+          this.push(new this.Model(values));
+        }, this));
       }, this));
     },
 
@@ -137,6 +149,9 @@ function extendModel(Collection, HttpStore, Model) {
    * `idAttribute` (String) overrides the attribute used for {@link module:dougal.Model#$id|$id}
    *
    * `initialize` (Function) constructor inheritance
+   *
+   * `parseList` (Function) Called (if present) before collection parsing. See {@link module:dougal.Collection#parse}.
+   *
    * @memberof module:dougal
    * @returns {ExtendedModel}
    * @since 0.1.0
@@ -522,12 +537,12 @@ function HttpStoreFactory($http, $interpolate) {
   /**
    * HTTP storage layer
    *
-   * | Action | URL | Method |
-   * |--------|-----|--------|
-   * | Index | `/cars` | GET |
-   * | Fetch | `/cars/:id` | GET |
-   * | Create | `/cars` | POST |
-   * | Update | `/cars/:id` | PUT |
+   * | Action | URL         | Method |
+   * |--------|-------------|--------|
+   * | Index  | `/cars`     | GET    |
+   * | Fetch  | `/cars/:id` | GET    |
+   * | Create | `/cars`     | POST   |
+   * | Update | `/cars/:id` | PUT    |
    * | Delete | `/cars/:id` | DELETE |
    *
    * @param options
@@ -545,10 +560,22 @@ function HttpStoreFactory($http, $interpolate) {
   HttpStore.prototype = {
     constructor: HttpStore,
 
+    /**
+     * Performs a POST request.
+     *
+     * @param model {module:dougal.Model}
+     * @returns {Promise}
+     */
     create: function (model) {
       return this.sync('POST', model);
     },
 
+    /**
+     * Performs a GET request for one instance.
+     *
+     * @param model {module:dougal.Model}
+     * @returns {Promise}
+     */
     fetch: function (model) {
       return this.http({
         url: this.url(model),
@@ -563,6 +590,12 @@ function HttpStoreFactory($http, $interpolate) {
         });
     },
 
+    /**
+     * Performs a GET request.
+     *
+     * @param criteria {any}
+     * @returns {Promise}
+     */
     list: function (criteria) {
       return this.http({
         url: this.baseUrl.index(criteria),
@@ -579,6 +612,12 @@ function HttpStoreFactory($http, $interpolate) {
       });
     },
 
+    /**
+     * Performs a PUT request.
+     *
+     * @param model {module:dougal.Model}
+     * @returns {Promise}
+     */
     update: function (model) {
       return this.sync('PUT', model);
     },

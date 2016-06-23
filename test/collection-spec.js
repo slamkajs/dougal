@@ -1,10 +1,11 @@
 describe('dougal.Collection', function () {
 
-  var Collection, Car, cars;
+  var $rootScope, Collection, Car, cars;
 
   beforeEach(module('dougal'));
 
   beforeEach(inject(function ($injector) {
+    $rootScope = $injector.get('$rootScope');
     Collection = $injector.get('Collection');
     Car = $injector.get('BasicCar');
 
@@ -16,12 +17,13 @@ describe('dougal.Collection', function () {
   });
 
   it('should accept values by default', function () {
-    var car = new Collection({
+    var cars = new Collection({
       model: Car,
       data: [{id: 1, name: 'Super Car!'}]
     });
-    expect(car.length).toBe(1);
-    expect(car[0].name).toEqual('Super Car!');
+    $rootScope.$digest();
+    expect(cars.length).toBe(1);
+    expect(cars[0].name).toEqual('Super Car!');
   });
 
   describe('clear', function () {
@@ -33,13 +35,26 @@ describe('dougal.Collection', function () {
   });
 
   describe('parse', function () {
+    var sampleResponse = [
+      {id: 1, name: 'Super Car!'},
+      {id: 2, name: 'Another Car!'}
+    ];
+
     it('should parse a JSON array in cars', function () {
-      cars.parse([
-        {id: 1, name: 'Super Car!'},
-        {id: 2, name: 'Another Car!'}
-      ]);
+      cars.parse(sampleResponse);
+      $rootScope.$digest();
       expect(cars[0] instanceof Car).toBe(true);
       expect(cars[1] instanceof Car).toBe(true);
+      expect(_.map(cars, 'name')).toEqual(['Super Car!', 'Another Car!']);
+    });
+
+    it('should allow to parse data with different structures', function () {
+      // equivalent to pass parseList through Model.extend
+      cars.Model.prototype.$$options.parseList = function (response) {
+        return response.data;
+      };
+      cars.parse({data: sampleResponse});
+      $rootScope.$digest();
       expect(_.map(cars, 'name')).toEqual(['Super Car!', 'Another Car!']);
     });
   });

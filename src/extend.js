@@ -51,6 +51,9 @@ function extendModel(Collection, HttpStore, Model) {
    * `idAttribute` (String) overrides the attribute used for {@link module:dougal.Model#$id|$id}
    *
    * `initialize` (Function) constructor inheritance
+   *
+   * `parseList` (Function) Called (if present) before collection parsing. See {@link module:dougal.Collection#parse}.
+   *
    * @memberof module:dougal
    * @returns {ExtendedModel}
    * @since 0.1.0
